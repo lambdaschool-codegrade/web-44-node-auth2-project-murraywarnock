@@ -51,6 +51,10 @@ function findById(user_id) {
       "role_name": "instructor"
     }
    */
+    return db("users as u")
+    .join("roles as r", "r.role_id", "u.role_id")
+    .where("u.user_id", user_id)
+    .select("u.user_id", "u.username", "r.role_name").first();
 }
 
 /**
