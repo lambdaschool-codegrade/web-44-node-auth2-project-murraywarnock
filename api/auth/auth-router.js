@@ -11,13 +11,14 @@ const {
   validateRoleName 
 } = require('./auth-middleware');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require("../secrets"); // use this secret!
+const { JWT_SECRET } = require("../secrets/index.js"); // use this secret!
 
 function buildToken(user) {
   const payload = {
     subject: user.id,
     username: user.username,
-    role: user.role,
+    role_name: user.role_name,
+    password: user.password
   };
   const options = {
     expiresIn: '1d',
@@ -71,10 +72,12 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
     }
    */
     try {
-      const token = buildToken(req.user);
       const { username, password } = req.user;
-     if (bcrypt.compareSync(req.body.password, password)) {
-        req.session.user = req.user;
+      if (bcrypt.compareSync(req.body.password, password)) {
+       const token = buildToken(req.user);
+
+        // req.session.user = req.user;
+
         // 1- a cookie will be set on the client with a sessionId
         // 2- the sessionId will also be stored in the server (the session)
         res.json({ 
