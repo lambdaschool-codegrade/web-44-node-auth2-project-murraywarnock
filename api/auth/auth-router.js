@@ -10,7 +10,20 @@ const {
   checkUsernameExists, 
   validateRoleName 
 } = require('./auth-middleware');
+const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require("../secrets"); // use this secret!
+
+function buildToken(user) {
+  const payload = {
+    subject: user.id,
+    username: user.username,
+    role: user.role,
+  };
+  const options = {
+    expiresIn: '1d',
+  };
+  return jwt.sign(payload, JWT_SECRET, options)
+}
 
 router.post("/register", validateRoleName, async (req, res, next) => {
   /**
@@ -58,14 +71,18 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
     }
    */
     try {
+      const token = buildToken(req.user);
       const { username, password } = req.user;
      if (bcrypt.compareSync(req.body.password, password)) {
         req.session.user = req.user;
         // 1- a cookie will be set on the client with a sessionId
         // 2- the sessionId will also be stored in the server (the session)
-        res.json({ message: `Welcome ${username}!` })
+        res.json({ 
+          message: `${username} is back!`,
+          token: token,
+      });
       } else {
-        next({ status: 401, message: "Invalid credentials" })
+        next({ status: 401, message: "Invalid credentials" });
       }
     } catch (err) {
       next(err);
