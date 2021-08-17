@@ -15,15 +15,14 @@ const { JWT_SECRET } = require("../secrets/index.js"); // use this secret!
 
 function buildToken(user) {
   const payload = {
-    subject: user.id,
+    subject: user.user_id,
     username: user.username,
     role_name: user.role_name,
-    password: user.password
   };
   const options = {
     expiresIn: '1d',
   };
-  return jwt.sign(payload, JWT_SECRET, options)
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 router.post("/register", validateRoleName, async (req, res, next) => {
@@ -78,8 +77,6 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
 
         // req.session.user = req.user;
 
-        // 1- a cookie will be set on the client with a sessionId
-        // 2- the sessionId will also be stored in the server (the session)
         res.json({ 
           message: `${username} is back!`,
           token: token,

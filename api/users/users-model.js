@@ -87,7 +87,7 @@ async function add({ username, password, role_name }) { // done for you
     if (role) {
       role_id_to_use = role.role_id;
     } else {
-      const [role_id] = await trx('roles').insert({ role_name: role_name });
+      const [role_id] = await trx('roles').insert({ role_name: role_name.trim() });
       role_id_to_use = role_id;
     }
     const [user_id] = await trx('users').insert({ username, password, role_id: role_id_to_use });
